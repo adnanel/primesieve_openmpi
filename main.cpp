@@ -52,7 +52,10 @@ int main(int argc, char *argv[]) {
             std::cout << rank << ": Found " << res.size() << " primes." << std::endl;
         }
 
-        nextWorker = 1U | ((nextWorker + 1) % numtasks);
+        nextWorker = (nextWorker + 1) % numtasks;
+        if (nextWorker == 0) {
+            nextWorker = 1;
+        }
     }
 
     MPI_Finalize();
