@@ -20,6 +20,8 @@ int main(int argc, char** argv) {
 */
 
 int main(int argc, char *argv[]) {
+    Sieve sieve;
+
     int numtasks, rank, rc;
     rc = MPI_Init(&argc, &argv);
     if (rc != MPI_SUCCESS) {
@@ -42,6 +44,10 @@ int main(int argc, char *argv[]) {
         } else {
             MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             std::cout << rank << ": I'm looking for primes in the range " << range[0] << " and " << range[1] << std::endl;
+
+            auto res = sieve.sieveOfEratosthenes(range[0], range[1]);
+
+            std::cout << rank << ": Found " << res.size() << "primes." << std::endl;
         }
     }
 
