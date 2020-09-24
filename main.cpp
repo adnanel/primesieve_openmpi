@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (rank == 0) {
-        constexpr int size = 2E9 / 430;
+        int size = 2E9 / (numtasks - 1);
         distributeTasks(rank, 0, 2E9, size, numtasks);
     } else {
         doTasks(rank);
