@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Sieve.h"
 
-#include "mpi.h"
-#include <stdio.h>
+#include <mpi.h>
+#include <cstdio>
 
 int numResults(int min, int max) {
     Sieve sieve;
