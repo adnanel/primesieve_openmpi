@@ -35,20 +35,24 @@ int main(int argc, char *argv[]) {
     int range[2];
     int size = 2E9 / 4;
     int sum = 0;
+    unsigned int nextWorker = 1;
     for (int i = 0; i <= 2E9 - size; i += size) {
         range[0] = i;
         range[1] = i + size;
 
         if (rank == 0) {
-            MPI_Send(range, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
+            std::cout << rank << ": Sending task to worker " << nextWorker << std::endl;
+            MPI_Send(range, 2, MPI_INT, nextWorker, 0, MPI_COMM_WORLD);
         } else {
             MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             std::cout << rank << ": I'm looking for primes in the range " << range[0] << " and " << range[1] << std::endl;
 
             auto res = sieve.sieveOfEratosthenes(range[0], range[1]);
 
-            std::cout << rank << ": Found " << res.size() << "primes." << std::endl;
+            std::cout << rank << ": Found " << res.size() << " primes." << std::endl;
         }
+
+        nextWorker = 1U | ((nextWorker + 1) % numtasks);
     }
 
     MPI_Finalize();
