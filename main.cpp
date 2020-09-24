@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         if (rank == 0) {
             MPI_Send(range, 2, MPI_INT, 1, 0, MPI_COMM_WORLD);
         } else {
-            MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD);
+            MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             std::cout << rank << ": I'm looking for primes in the range " << range[0] << " and " << range[1] << std::endl;
         }
     }
