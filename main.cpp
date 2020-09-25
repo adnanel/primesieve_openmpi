@@ -8,6 +8,10 @@
 void distributeTasks(int rank, int min, int max, int size, int numtasks) {
     int range[2];
     int nextWorker = rank + 1;
+    char portName[1024];
+
+    int usedPort = MPI_Open_port(MPI_INFO_NULL, portName);
+    std::cout << "Using port " << usedPort << ": " << portName << std::endl;
 
     for (int i = min; i <= max - size; i += size) {
         range[0] = i;
@@ -54,18 +58,15 @@ int main(int argc, char *argv[]) {
         MPI_Abort(MPI_COMM_WORLD, rc);
     }
 
-    char portName[1024];
-    int usedPort = MPI_Open_port(MPI_INFO_NULL, portName);
-    std::cout << "Using port " << usedPort << ": " << portName << std::endl;
-
-    int number;
-    std::cout << "N=";
-    std::cin >> number;
 
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (rank == 0) {
+        int number;
+        std::cout << "N=";
+        std::cin >> number;
+
         int size = number / (numtasks - 1);
         distributeTasks(rank, 0, 2E9, size, numtasks);
     } else {
