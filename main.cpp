@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         std::cin >> number;
 
         int size = number / (numtasks - 1);
-        distributeTasks(rank, 0, 2E9, size, numtasks);
+        distributeTasks(rank, 0, number, size, numtasks);
     } else {
         doTasks(rank);
     }
