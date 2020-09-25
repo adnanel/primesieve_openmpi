@@ -21,18 +21,29 @@ void distributeTasks(int rank, int min, int max, int size, int numtasks) {
             nextWorker = (nextWorker + 1) % numtasks;
         }
     }
+
+    range[0] = range[1] = -1;
+    for (int i = 1; i < numtasks; ++ i) {
+        MPI_Send(range, 2, MPI_INT, i, 0, MPI_COMM_WORLD);
+    }
 }
 
 void doTasks(int rank) {
     Sieve sieve;
     int range[2];
 
-    MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    std::cout << rank << ": I'm looking for primes in the range " << range[0] << " and " << range[1] << std::endl;
+    while (true) {
+        MPI_Recv(range, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (range[0] < 0 && range[1] < 0) {
+            break;
+        }
+        std::cout << rank << ": I'm looking for primes in the range " << range[0] << " and " << range[1] << std::endl;
 
-    auto res = sieve.sieveOfEratosthenes(range[0], range[1]);
+        auto res = sieve.sieveOfEratosthenes(range[0], range[1]);
 
-    std::cout << rank << ": Found " << res.size() << " primes." << std::endl;
+        std::cout << rank << ": Found " << res.size() << " primes." << std::endl;
+    }
+    std::cout << rank << ": Shutting down" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -43,11 +54,19 @@ int main(int argc, char *argv[]) {
         MPI_Abort(MPI_COMM_WORLD, rc);
     }
 
+    char portName[1024];
+    int usedPort = MPI_Open_port(MPI_INFO_NULL, portName);
+    std::cout << "Using port " << usedPort << ": " << portName << std::endl;
+
+    int number;
+    std::cout << "N=";
+    std::cin >> number;
+
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (rank == 0) {
-        int size = 2E9 / (numtasks - 1);
+        int size = number / (numtasks - 1);
         distributeTasks(rank, 0, 2E9, size, numtasks);
     } else {
         doTasks(rank);
